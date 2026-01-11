@@ -1,0 +1,14 @@
+{
+  "name": "homechat-docs",
+  "version": "1.0.0",
+  "description": "HomeChat documentation site",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.5.0"
+  }
+}

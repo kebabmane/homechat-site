@@ -1,0 +1,41 @@
+:root {
+  --vp-c-brand-1: #2563eb;
+  --vp-c-brand-2: #3b82f6;
+  --vp-c-brand-3: #60a5fa;
+  --vp-c-brand-soft: rgba(37, 99, 235, 0.14);
+}
+
+.dark {
+  --vp-c-brand-1: #3b82f6;
+  --vp-c-brand-2: #60a5fa;
+  --vp-c-brand-3: #93c5fd;
+  --vp-c-brand-soft: rgba(59, 130, 246, 0.16);
+}
+
+/* Hero section enhancements */
+.VPHero .image-container {
+  transform: scale(1.1);
+}
+
+/* Feature icons */
+.VPFeature .icon {
+  font-size: 2rem;
+}
+
+/* Code block styling */
+.vp-code-group .tabs label {
+  font-size: 0.875rem;
+}
+
+/* Custom container styling */
+.custom-block.tip {
+  border-color: var(--vp-c-brand-1);
+}
+
+.custom-block.warning {
+  border-color: #f59e0b;
+}
+
+.custom-block.danger {
+  border-color: #ef4444;
+}

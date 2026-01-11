@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'HomeChat',
   description: 'Self-hosted chat for Home Assistant',
+  base: '/homechat-site/',
 
   head: [
     ['link', { rel: 'icon', href: '/logo.svg' }]

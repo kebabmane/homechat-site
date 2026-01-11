@@ -3,15 +3,25 @@ name: Deploy Docs
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -19,20 +29,27 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
       - name: Install dependencies
         run: npm ci
 
       - name: Build VitePress site
         run: npm run build
 
-      - name: Deploy to Hetzner Object Storage
-        uses: jakejarvis/s3-sync-action@master
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          args: --delete --acl public-read
-        env:
-          AWS_S3_BUCKET: ${{ secrets.HETZNER_BUCKET_NAME }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_SECRET_KEY }}
-          AWS_S3_ENDPOINT: https://${{ secrets.HETZNER_ENDPOINT }}
-          AWS_REGION: eu-central-1  # Required but ignored for Hetzner
-          SOURCE_DIR: '.vitepress/dist'
+          path: .vitepress/dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

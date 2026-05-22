@@ -2,6 +2,14 @@
 
 Static documentation site for HomeChat, built with VitePress.
 
+This repo documents the HomeChat ecosystem:
+
+- Rails server and web UI: `homechat`
+- Android app: `homechat-android`
+- iOS app: `homechat-ios`
+- Home Assistant custom integration: `homechat-integration`
+- Home Assistant add-on: `homechat-addon`
+
 ## Development
 
 ### Prerequisites
@@ -82,6 +90,14 @@ homechat-site/
 ```
 
 ## Content
+
+The API reference should stay aligned with the canonical OpenAPI contract in the Rails repo:
+
+```text
+homechat/api-contracts/openapi.yaml
+```
+
+When API endpoints, response fields, E2EE metadata, or compatibility requirements change, update both the Rails contract and the matching pages under `api/`.
 
 ### Adding Pages
 

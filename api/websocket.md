@@ -17,10 +17,10 @@ ws://localhost:3000/cable
 
 ### Authentication
 
-Include your API token as a query parameter:
+Prefer clients that can send the API token in an `Authorization: Bearer <token>` header during the WebSocket handshake. Query-string tokens remain supported only as a fallback for clients that cannot set WebSocket headers.
 
 ```
-wss://chat.example.com/cable?token=hc_abc12345_xxx...
+wss://chat.example.com/cable
 ```
 
 ## Channels
@@ -41,9 +41,7 @@ HomeChat provides several ActionCable channels:
 import { createConsumer } from "@rails/actioncable"
 
 // Create consumer with authentication
-const consumer = createConsumer(
-  `wss://chat.example.com/cable?token=${apiToken}`
-)
+const consumer = createConsumer("wss://chat.example.com/cable")
 ```
 
 ### Subscribe to Chat Messages

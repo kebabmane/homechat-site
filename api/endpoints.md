@@ -128,7 +128,7 @@ Authorization: Bearer <token>
 Get messages from a channel with pagination.
 
 ```http
-GET /api/v1/messages?channel=<channel_name>&limit=50&before=<message_id>
+GET /api/v1/messages?channel_id=<channel_id>&limit=50
 Authorization: Bearer <token>
 ```
 
@@ -136,9 +136,8 @@ Authorization: Bearer <token>
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| `channel` | Yes | Channel name |
+| `channel_id` | No | Numeric channel ID. If omitted, returns messages across accessible channels |
 | `limit` | No | Max messages (default: 50) |
-| `before` | No | Get messages before this ID |
 
 **Response (200):**
 
@@ -402,26 +401,26 @@ Returns metrics in Prometheus exposition format for monitoring systems.
 ### List DM Conversations
 
 ```http
-GET /api/v1/direct_messages
+GET /api/v1/dm/channels
 Authorization: Bearer <token>
 ```
 
 ### Get DM Conversation
 
 ```http
-GET /api/v1/direct_messages/:user_id
+POST /api/v1/dm/start
 Authorization: Bearer <token>
 ```
 
 ### Send Direct Message
 
 ```http
-POST /api/v1/direct_messages/:user_id
+POST /api/v1/users/:user_id/messages
 Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "content": "Hello!"
+  "message": "Hello!"
 }
 ```
 
@@ -450,14 +449,12 @@ files[]=@/path/to/image.jpg
 Endpoints that return lists support cursor-based pagination:
 
 ```http
-GET /api/v1/messages?channel=general&limit=50&before=100
+GET /api/v1/messages?channel_id=1&limit=50
 ```
 
 | Parameter | Description |
 |-----------|-------------|
 | `limit` | Items per page (default: 50, max: 100) |
-| `before` | Get items before this ID |
-| `after` | Get items after this ID |
 
 **Response includes pagination info:**
 

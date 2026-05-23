@@ -66,7 +66,7 @@ HomeChat supports common security requirements:
 
 Stay informed about security updates:
 
-1. Watch the [GitHub repository](https://github.com/rhysevans/homechat) for releases
+1. Watch the [GitHub repository](https://github.com/kebabmane/homechat) for releases
 2. Subscribe to security advisories
 3. Run `bundle exec bundler-audit` before updates
 4. Review changelog for security fixes

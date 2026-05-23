@@ -4,7 +4,7 @@ Welcome to HomeChat! This guide will help you get up and running with your self-
 
 ## What is HomeChat?
 
-HomeChat is a lightweight, self-hosted chat application designed specifically for Home Assistant users. It provides:
+HomeChat is a lightweight, self-hosted chat application for households, teams, and Home Assistant users. It provides:
 
 - **Real-time messaging** with channels and direct messages
 - **Bot integrations** for Home Assistant automations
@@ -15,7 +15,7 @@ HomeChat is a lightweight, self-hosted chat application designed specifically fo
 
 Before installing HomeChat, ensure you have:
 
-- **Ruby 3.3+** (for local development)
+- **Ruby 4.0+** (for local development)
 - **Docker** (for containerized deployment)
 - **SQLite 3** (included with most systems)
 
@@ -46,7 +46,7 @@ For standalone Docker deployment:
 git clone https://github.com/kebabmane/homechat.git
 cd homechat
 
-# Start with Docker Compose
+# Start the development container
 docker compose up -d
 ```
 

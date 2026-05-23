@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: HomeChat
-  text: Self-hosted chat for Home Assistant
-  tagline: Lightweight, secure, real-time messaging for your smart home
+  text: Self-hosted chat for households and teams
+  tagline: Offline-first, secure, real-time messaging for your home network and automations
   image:
     src: /logo.svg
     alt: HomeChat
@@ -30,8 +30,8 @@ features:
     title: Native Clients
     details: iOS, Android, and macOS clients share the same API contract, E2EE model, and server discovery flow.
   - icon: 🏠
-    title: Home Assistant Native
-    details: Purpose-built for Home Assistant users. Run as an add-on, integrate via webhooks, and control your smart home from chat.
+    title: Home Assistant Ready
+    details: Run as an add-on, integrate via webhooks, and bring smart home notifications into the same private chat system.
   - icon: ⚡
     title: Lightweight & Fast
     details: Optimized for Raspberry Pi and low-power servers. SQLite database, Solid Cable for real-time, minimal resource usage.
@@ -39,13 +39,13 @@ features:
 
 ## Why HomeChat?
 
-HomeChat was built to solve a simple problem: **home automation needs a communication hub**.
+HomeChat was built to solve a simple problem: **private homes and small teams need a communication hub that works on their own network**.
 
-Whether you want to receive alerts when someone's at the door, send commands to your devices, or just chat with family members about household tasks—HomeChat brings it all together in one self-hosted, privacy-respecting platform.
+Whether you want to chat with family, coordinate household tasks, receive alerts when someone's at the door, or send commands to devices, HomeChat brings it together in one self-hosted, privacy-respecting platform.
 
-### Built for Home Assistant
+### Built for Local Automation
 
-Unlike generic chat applications, HomeChat is designed specifically for smart home enthusiasts:
+Unlike generic chat applications, HomeChat is designed for local-first communication and smart home workflows:
 
 - **Webhook bots** receive events from Home Assistant automations
 - **API tokens** let your scripts post messages programmatically

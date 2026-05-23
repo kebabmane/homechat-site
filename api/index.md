@@ -120,8 +120,8 @@ curl https://chat.example.com/api/v1/health
 
 ### Official
 
-- **iOS SDK** — Built into the [iOS app](https://github.com/rhysevans/homechat-ios)
-- **Android SDK** — Built into the [Android app](https://github.com/rhysevans/homechat-android)
+- **iOS SDK** — Built into the [iOS app](https://github.com/kebabmane/homechat-ios)
+- **Android SDK** — Built into the [Android app](https://github.com/kebabmane/homechat-android)
 
 ### Community
 

@@ -195,4 +195,4 @@ OAuth integration is planned for future releases:
 - GitHub
 - OIDC providers
 
-Follow the [roadmap](https://github.com/rhysevans/homechat) for updates.
+Follow the [roadmap](https://github.com/kebabmane/homechat) for updates.

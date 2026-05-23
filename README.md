@@ -7,8 +7,10 @@ This repo documents the HomeChat ecosystem:
 - Rails server and web UI: `homechat`
 - Android app: `homechat-android`
 - iOS app: `homechat-ios`
+- macOS app: `homechat-macos`
 - Home Assistant custom integration: `homechat-integration`
 - Home Assistant add-on: `homechat-addon`
+- Bot gem: `homechat-bot`
 
 ## Development
 

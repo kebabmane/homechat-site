@@ -21,8 +21,9 @@ HomeChat is a full-featured chat application built specifically for smart home e
 
 ### Mobile & PWA
 
-- **Native iOS App** — Swift-based with push notifications
-- **Native Android App** — Kotlin-based with FCM
+- **Native iOS App** — SwiftUI client with discovery, E2EE, offline cache, and notification coordination
+- **Native Android App** — Kotlin/Compose client with FCM, Room/SQLCipher support, and offline sync
+- **Native macOS App** — SwiftUI desktop client with sign-in, channels, messaging, and E2EE
 - **Progressive Web App** — Install directly from browser
 - **QR Code Setup** — Easy mobile app configuration
 
@@ -63,6 +64,7 @@ HomeChat supports three types of bots:
 
 ### Security
 
+- **Private/DM E2EE** — Current web, iOS, Android, and macOS clients encrypt private-channel and direct-message content before upload
 - **BCrypt Tokens** — Hashed API tokens
 - **Rate Limiting** — Rack::Attack protection
 - **CSP Headers** — Content Security Policy

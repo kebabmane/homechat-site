@@ -12,7 +12,7 @@ HomeChat uses the Rails API version as the primary compatibility contract. Clien
 | Android app | 1.0.1 | [kebabmane/homechat-android](https://github.com/kebabmane/homechat-android) |
 | macOS app | 0.1.0 | [kebabmane/homechat-macos](https://github.com/kebabmane/homechat-macos) |
 | Home Assistant integration | 1.2.2 | [kebabmane/homechat-integration](https://github.com/kebabmane/homechat-integration) |
-| Home Assistant add-on | 1.0.26 | [kebabmane/homechat-addon](https://github.com/kebabmane/homechat-addon) |
+| Home Assistant add-on | 1.0.27 | [kebabmane/homechat-addon](https://github.com/kebabmane/homechat-addon) |
 | Bot gem | 0.1.0 | [kebabmane/homechat-bot](https://github.com/kebabmane/homechat-bot) |
 | Docs site | 1.0.0 | [kebabmane/homechat-site](https://github.com/kebabmane/homechat-site) |
 

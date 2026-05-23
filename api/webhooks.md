@@ -14,13 +14,12 @@ POST /api/v1/webhooks/{webhook_id}
 
 ### Via Admin Panel
 
-1. Go to **Admin → Automations**
+1. Go to **Admin → Bots**
 2. Click **New Bot**
 3. Select **Webhook** as the type
 4. Enter a name and description
-5. Select the target channel
-6. Click **Create**
-7. Copy the webhook URL and secret
+5. Click **Create**
+6. Copy the webhook URL and secret from the bot details page
 
 ### Webhook Details
 
@@ -33,12 +32,20 @@ After creation, you receive:
 
 ## Sending Webhook Requests
 
-### Basic Request
+### Basic Signed Request
+
+Webhook signatures are required. Unsigned requests are rejected.
 
 ```bash
-curl -X POST https://chat.example.com/api/v1/webhooks/abc123 \
+WEBHOOK_URL="https://chat.example.com/api/v1/webhooks/abc123"
+WEBHOOK_SECRET="your_webhook_secret"
+PAYLOAD='{"action":"send_message","message":"Hello from webhook!","room_id":"home-assistant"}'
+SIGNATURE=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" | cut -d' ' -f2)
+
+curl -X POST "$WEBHOOK_URL" \
   -H "Content-Type: application/json" \
-  -d '{"action": "send_message", "content": "Hello from webhook!"}'
+  -H "X-Hub-Signature-256: sha256=$SIGNATURE" \
+  -d "$PAYLOAD"
 ```
 
 ### Payload Format
@@ -46,20 +53,22 @@ curl -X POST https://chat.example.com/api/v1/webhooks/abc123 \
 ```json
 {
   "action": "send_message",
-  "channel_id": 1,
-  "content": "Hello from webhook!"
+  "room_id": "home-assistant",
+  "message": "Hello from webhook!",
+  "title": "Optional title"
 }
 ```
 
 | Field | Required | Description |
 |-------|----------|-------------|
 | `action` | Yes | Action to perform (`send_message`) |
-| `content` | Yes | Message content |
-| `channel_id` | No | Override target channel |
+| `message` | Yes | Message content |
+| `room_id` | No | Target channel name. Missing values use `home-assistant` |
+| `title` | No | Title prepended to the message |
 
 ## Signature Verification
 
-For security, webhooks should include an HMAC-SHA256 signature.
+Webhooks must include an HMAC-SHA256 signature.
 
 ### Signing Requests
 
@@ -70,7 +79,7 @@ Calculate the signature using your webhook secret:
 require 'openssl'
 
 secret = "your_webhook_secret"
-payload = '{"action":"send_message","content":"Hello!"}'
+payload = '{"action":"send_message","message":"Hello!"}'
 
 signature = OpenSSL::HMAC.hexdigest("SHA256", secret, payload)
 # => "abc123..."
@@ -82,7 +91,7 @@ import hmac
 import hashlib
 
 secret = b"your_webhook_secret"
-payload = b'{"action":"send_message","content":"Hello!"}'
+payload = b'{"action":"send_message","message":"Hello!"}'
 
 signature = hmac.new(secret, payload, hashlib.sha256).hexdigest()
 ```
@@ -92,7 +101,7 @@ signature = hmac.new(secret, payload, hashlib.sha256).hexdigest()
 const crypto = require('crypto');
 
 const secret = 'your_webhook_secret';
-const payload = '{"action":"send_message","content":"Hello!"}';
+const payload = '{"action":"send_message","message":"Hello!"}';
 
 const signature = crypto
   .createHmac('sha256', secret)
@@ -108,23 +117,23 @@ Add the signature to the request header:
 curl -X POST https://chat.example.com/api/v1/webhooks/abc123 \
   -H "Content-Type: application/json" \
   -H "X-Hub-Signature-256: sha256=abc123..." \
-  -d '{"action": "send_message", "content": "Hello!"}'
+  -d '{"action": "send_message", "message": "Hello!"}'
 ```
 
 ### Verification Process
 
 HomeChat verifies webhooks by:
 
-1. Extracting the signature from `X-Hub-Signature-256` header
+1. Extracting the signature from the `X-Hub-Signature-256` or `X-Signature-256` header
 2. Computing HMAC-SHA256 of the raw request body
 3. Comparing signatures using constant-time comparison
-4. Rejecting requests with invalid signatures
+4. Rejecting requests with missing or invalid signatures
 
 ## Integration Examples
 
 ### GitHub Webhooks
 
-Configure GitHub to send notifications to HomeChat:
+Configure GitHub to send notifications to HomeChat only if you want the raw GitHub payload posted or you place a small signer/formatter in front of HomeChat:
 
 1. Go to repo **Settings → Webhooks**
 2. Add webhook URL from HomeChat
@@ -132,7 +141,7 @@ Configure GitHub to send notifications to HomeChat:
 4. Enter the webhook secret
 5. Select events (push, PR, issues, etc.)
 
-**GitHub sends payloads like:**
+GitHub sends payloads like:
 
 ```json
 {
@@ -144,8 +153,8 @@ Configure GitHub to send notifications to HomeChat:
 }
 ```
 
-::: tip Custom Parsing
-HomeChat can be configured to parse GitHub payloads and format them nicely. Check the webhook settings in the admin panel.
+::: tip Format Upstream
+HomeChat's webhook endpoint accepts generic signed JSON. For polished GitHub messages, transform the provider payload into HomeChat's `send_message` shape before forwarding it.
 :::
 
 ### Home Assistant
@@ -163,7 +172,7 @@ rest_command:
       X-Hub-Signature-256: >-
         sha256={{ (states.input_text.webhook_body.state |
                    hmac('your_secret', 'sha256')) }}
-    payload: '{"action":"send_message","content":"{{ message }}"}'
+    payload: '{"action":"send_message","room_id":"home-assistant","message":"{{ message }}"}'
 ```
 
 **Automation example:**
@@ -183,14 +192,14 @@ automation:
 
 ### Alertmanager
 
-Configure Prometheus Alertmanager to send alerts:
+Prometheus Alertmanager does not sign webhook payloads by itself. Use a small relay that signs and forwards the Alertmanager payload to HomeChat.
 
 ```yaml
 # alertmanager.yml
 receivers:
   - name: 'homechat'
     webhook_configs:
-      - url: 'https://chat.example.com/api/v1/webhooks/abc123'
+      - url: 'https://relay.example.com/homechat-alertmanager'
         send_resolved: true
 ```
 
@@ -206,7 +215,7 @@ WEBHOOK_URL="https://chat.example.com/api/v1/webhooks/abc123"
 SECRET="your_webhook_secret"
 MESSAGE="$1"
 
-PAYLOAD="{\"action\":\"send_message\",\"content\":\"$MESSAGE\"}"
+PAYLOAD="{\"action\":\"send_message\",\"room_id\":\"home-assistant\",\"message\":\"$MESSAGE\"}"
 SIGNATURE=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | cut -d' ' -f2)
 
 curl -X POST "$WEBHOOK_URL" \
@@ -219,7 +228,7 @@ curl -X POST "$WEBHOOK_URL" \
 
 ### 401 Unauthorized
 
-Invalid or missing signature:
+Invalid webhook ID, inactive bot, or invalid/missing signature:
 
 ```json
 {
@@ -229,21 +238,21 @@ Invalid or missing signature:
 
 ### 404 Not Found
 
-Webhook doesn't exist or is disabled:
+Unknown route:
 
 ```json
 {
-  "error": "Webhook not found"
+  "error": "Not found"
 }
 ```
 
-### 422 Unprocessable Entity
+### 403 Forbidden
 
-Invalid payload:
+Bot/webhook attempted to post plaintext into an E2EE-enforced private or direct channel:
 
 ```json
 {
-  "error": "Missing required field: content"
+  "code": "e2ee_bot_posting_forbidden"
 }
 ```
 
@@ -262,17 +271,17 @@ Exceeding limits returns `429 Too Many Requests`.
 
 ### Disabling a Webhook
 
-1. Go to **Admin → Automations**
+1. Go to **Admin → Bots**
 2. Find the webhook
 3. Toggle **Active** to off
 
-Disabled webhooks return 404 for all requests.
+Disabled webhooks return `401 Unauthorized` as an invalid or inactive webhook.
 
 ### Rotating Secrets
 
 If a webhook secret is compromised:
 
-1. Go to **Admin → Automations**
+1. Go to **Admin → Bots**
 2. Click the webhook
 3. Click **Regenerate Secret**
 4. Update the secret in your integration
@@ -280,7 +289,7 @@ If a webhook secret is compromised:
 
 ### Deleting a Webhook
 
-1. Go to **Admin → Automations**
+1. Go to **Admin → Bots**
 2. Click the webhook
 3. Click **Delete**
 4. Confirm deletion

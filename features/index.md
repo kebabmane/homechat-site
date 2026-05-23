@@ -1,6 +1,6 @@
 # Features Overview
 
-HomeChat is a full-featured chat application built specifically for smart home enthusiasts.
+HomeChat is a full-featured, self-hosted chat application for households, small teams, and local automation workflows.
 
 ## Core Features
 

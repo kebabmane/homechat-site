@@ -175,7 +175,7 @@ Create a webhook bot in HomeChat for two-way communication.
 
 ### Create Bot
 
-1. Go to **Admin → Automations**
+1. Go to **Admin → Bots**
 2. Click **New Bot**
 3. Select "Webhook" type
 4. Copy the webhook URL
@@ -190,7 +190,7 @@ rest_command:
     headers:
       Content-Type: application/json
       X-Hub-Signature-256: "sha256={{ webhook_signature }}"
-    payload: '{"action": "send_message", "channel_id": 1, "content": "{{ message }}"}'
+    payload: '{"action": "send_message", "room_id": "home-assistant", "message": "{{ message }}"}'
 ```
 
 ## Troubleshooting

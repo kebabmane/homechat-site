@@ -16,7 +16,7 @@ Webhook bots receive events from external services.
 
 ### Creating a Webhook Bot
 
-1. Go to **Admin → Automations**
+1. Go to **Admin → Bots**
 2. Click **New Bot**
 3. Select "Webhook" as the type
 4. Enter a name and description
@@ -34,8 +34,8 @@ POST /api/v1/webhooks/{webhook_id}
 ```json
 {
   "action": "send_message",
-  "channel_id": 1,
-  "content": "Hello from webhook!"
+  "room_id": "home-assistant",
+  "message": "Hello from webhook!"
 }
 ```
 
@@ -63,10 +63,10 @@ signature = OpenSSL::HMAC.hexdigest(
 
 ### Example: GitHub Webhook
 
-Configure GitHub to send notifications to HomeChat:
+Configure GitHub to send notifications to HomeChat through a small relay that signs and formats the GitHub payload:
 
 1. Go to repo **Settings → Webhooks**
-2. Add webhook URL from HomeChat
+2. Add your relay URL
 3. Set content type to `application/json`
 4. Enter the webhook secret
 5. Select events to receive
@@ -77,7 +77,7 @@ API bots use standard REST API with token authentication.
 
 ### Creating an API Token
 
-1. Go to **Admin → Automations → API Tokens**
+1. Go to **Admin → Bots**
 2. Enter a descriptive name
 3. Click **Create Token**
 4. Copy the token immediately (shown once)
@@ -88,7 +88,7 @@ API bots use standard REST API with token authentication.
 curl -X POST https://chat.example.com/api/v1/channels/1/messages \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"content": "Hello from API!"}'
+  -d '{"message": "Hello from API!"}'
 ```
 
 ### Example: Python Script
@@ -103,7 +103,7 @@ def send_message(channel_id, content):
     response = requests.post(
         f"{BASE_URL}/channels/{channel_id}/messages",
         headers={"Authorization": f"Bearer {API_TOKEN}"},
-        json={"content": content}
+        json={"message": content}
     )
     return response.json()
 
@@ -121,7 +121,7 @@ AI bots use LLMs to respond to messages.
 
 ### Creating an AI Bot
 
-1. Go to **Admin → Automations**
+1. Go to **Admin → Bots**
 2. Click **New AI Bot**
 3. Configure:
    - **Name** — Bot's display name
@@ -165,6 +165,6 @@ Bots can only:
 - Access public channel messages
 
 Bots cannot:
-- Access private channels (unless explicitly added)
+- Post plaintext into E2EE-enforced private channels or direct messages
 - Modify user accounts
 - Change server settings

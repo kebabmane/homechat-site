@@ -94,7 +94,7 @@ curl -X GET https://chat.example.com/api/v1/channels \
 curl -X POST https://chat.example.com/api/v1/channels/1/messages \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"content": "Hello from the API!"}'
+  -d '{"message": "Hello from the API!"}'
 ```
 
 ### Health Check
@@ -146,7 +146,7 @@ class HomeChatClient:
         r = requests.post(
             f"{self.base_url}/api/v1/channels/{channel_id}/messages",
             headers=self.headers,
-            json={"content": content}
+            json={"message": content}
         )
         return r.json()
 

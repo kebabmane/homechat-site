@@ -28,7 +28,7 @@ Token format: hc_xxxxxxxx_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 
 ### Via Admin Panel
 
-1. Go to **Admin → Automations → API Tokens**
+1. Go to **Admin → Bots**
 2. Enter a descriptive name
 3. Click **Create Token**
 4. **Copy the token immediately** (shown only once)
@@ -55,7 +55,7 @@ puts token.raw_token
 curl -X POST https://chat.example.com/api/v1/channels/1/messages \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"content": "Hello from API!"}'
+  -d '{"message": "Hello from API!"}'
 ```
 
 ### In Integrations
@@ -69,6 +69,8 @@ notify:
     resource: https://chat.example.com/api/v1/channels/1/messages
     headers:
       Authorization: "Bearer YOUR_TOKEN"
+    method: POST
+    payload: '{"message":"Hello from Home Assistant"}'
 ```
 
 **Python Script:**
@@ -82,7 +84,7 @@ def send_message(channel_id, content):
     response = requests.post(
         f"{BASE_URL}/channels/{channel_id}/messages",
         headers={"Authorization": f"Bearer {API_TOKEN}"},
-        json={"content": content}
+        json={"message": content}
     )
     return response.json()
 ```
@@ -166,7 +168,7 @@ Immediately revoke tokens when:
 ### How to Revoke
 
 **Via Admin Panel:**
-1. Go to **Admin → Automations → API Tokens**
+1. Go to **Admin → Bots**
 2. Find the token by name/prefix
 3. Click **Revoke**
 

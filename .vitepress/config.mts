@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'HomeChat',
-  description: 'Self-hosted chat for Home Assistant',
+  description: 'Self-hosted chat for households, teams, and local automation',
   base: '/homechat-site/',
 
   head: [
@@ -51,7 +51,7 @@ export default defineConfig({
             { text: 'Overview', link: '/features/' },
             { text: 'Channels & DMs', link: '/features/channels' },
             { text: 'Bot Integrations', link: '/features/bots' },
-            { text: 'Mobile Apps', link: '/features/mobile' },
+            { text: 'Native Clients', link: '/features/mobile' },
             { text: 'PWA Support', link: '/features/pwa' }
           ]
         }

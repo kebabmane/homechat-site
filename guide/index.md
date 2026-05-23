@@ -46,8 +46,9 @@ For standalone Docker deployment:
 git clone https://github.com/kebabmane/homechat.git
 cd homechat
 
-# Start the development container
-docker compose up -d
+# Create the production .env secrets shown in the installation guide,
+# then start the canonical production compose file.
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 [Learn more →](/guide/docker)

@@ -1,53 +1,97 @@
 # REST API Endpoints
 
-Complete reference for HomeChat REST API endpoints.
+Complete reference for the current HomeChat API v1 routes.
+
+All authenticated endpoints require:
+
+```http
+Authorization: Bearer <token>
+```
+
+## Discovery & Health
+
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| `GET` | `/api/v1/health` | No | Basic API health, API version, minimum client version, push support |
+| `GET` | `/api/v1/server_info` | No | Server name, mode, capabilities, WebSocket path, E2EE flags, registration status |
+| `GET` | `/api/v1/metrics/health` | No | Lightweight metrics health check |
+| `GET` | `/api/v1/metrics` | Admin | Detailed JSON or Prometheus metrics |
+
+### Health Response
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-05-23T10:30:00Z",
+  "version": "1.0.0",
+  "api_version": "1.0.0",
+  "min_client_version": "1.0.0",
+  "service": "HomeChat",
+  "push_enabled": true
+}
+```
+
+### Server Info Response
+
+```json
+{
+  "server_name": "HomeChat on home-server",
+  "version": "1.0.1",
+  "mode": "local",
+  "capabilities": ["chat", "api", "webhooks", "realtime"],
+  "websocket_path": "/cable",
+  "push_enabled": true,
+  "api_version": "1.0.0",
+  "min_client_version": "1.0.0",
+  "e2ee_enabled": true,
+  "e2ee_required_private_dm": true,
+  "min_e2ee_version": "1",
+  "registration_enabled": true
+}
+```
+
+## Authentication
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `POST` | `/api/v1/signin` | Sign in with username/password |
+| `POST` | `/api/v1/signin/verify_2fa` | Complete 2FA sign-in |
+| `POST` | `/api/v1/signup` | Create an account when registration is enabled |
+| `DELETE` | `/api/v1/signout` | Revoke the current session |
+| `POST` | `/api/v1/auth/refresh` | Refresh an API session token |
+| `GET` | `/api/v1/auth/sessions` | List current user's sessions |
+| `DELETE` | `/api/v1/auth/sessions/:id` | Revoke a session |
+
+## Current User
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/api/v1/me` | Current user profile |
+| `PATCH` | `/api/v1/me` | Update profile |
+| `POST` | `/api/v1/me/change_password` | Change password |
+| `DELETE` | `/api/v1/me/avatar` | Remove avatar |
+
+## Two-Factor Authentication
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/api/v1/2fa/status` | Current 2FA status |
+| `POST` | `/api/v1/2fa/setup` | Start TOTP setup |
+| `POST` | `/api/v1/2fa/verify` | Verify and enable TOTP |
+| `POST` | `/api/v1/2fa/disable` | Disable TOTP |
+| `GET` | `/api/v1/2fa/backup_codes` | Get backup codes |
+| `POST` | `/api/v1/2fa/regenerate_backup_codes` | Regenerate backup codes |
 
 ## Channels
 
 ### List Channels
-
-Get all channels the user has access to.
 
 ```http
 GET /api/v1/channels
 Authorization: Bearer <token>
 ```
 
-**Response (200):**
-
-```json
-{
-  "channels": [
-    {
-      "id": 1,
-      "name": "general",
-      "description": "General discussion",
-      "type": "public",
-      "member_count": 10,
-      "online_member_count": 3,
-      "last_message": {
-        "id": 100,
-        "content": "Hello!",
-        "created_at": "2024-01-15T10:30:00Z",
-        "user": {
-          "id": 1,
-          "username": "johndoe"
-        }
-      },
-      "unread_count": 0,
-      "is_member": true,
-      "created_at": "2024-01-01T00:00:00Z"
-    }
-  ]
-}
-```
-
-### Get Channel
-
-```http
-GET /api/v1/channels/:id
-Authorization: Bearer <token>
-```
+Returns public channels and private channels accessible to the current user. Direct message channels are listed separately under `/api/v1/dm/channels`.
 
 ### Create Channel
 
@@ -59,109 +103,35 @@ Content-Type: application/json
 {
   "name": "announcements",
   "description": "Important announcements",
-  "private": false
+  "channel_type": "public"
 }
 ```
 
-### Join Channel
+Use `channel_type: "private"` for invite-only channels. The creator is automatically added as a member.
 
-```http
-POST /api/v1/channels/:id/join
-Authorization: Bearer <token>
-```
+### Channel Actions
 
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "message": "Successfully joined channel"
-}
-```
-
-### Leave Channel
-
-```http
-DELETE /api/v1/channels/:id/leave
-Authorization: Bearer <token>
-```
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "message": "Successfully left channel"
-}
-```
-
-### Get Channel Members
-
-```http
-GET /api/v1/channels/:id/members
-Authorization: Bearer <token>
-```
-
-**Response (200):**
-
-```json
-{
-  "members": [
-    {
-      "id": 1,
-      "username": "johndoe",
-      "is_online": true,
-      "status": "Available",
-      "last_seen_at": "2024-01-15T10:30:00Z",
-      "avatar_url": null,
-      "avatar_initials": "J",
-      "avatar_color_index": 3
-    }
-  ]
-}
-```
+| Method | Path | Purpose |
+|--------|------|---------|
+| `POST` | `/api/v1/channels/:id/join` | Join an accessible public channel |
+| `DELETE` | `/api/v1/channels/:id/leave` | Leave a channel |
+| `GET` | `/api/v1/channels/:id/members` | List channel members |
+| `POST` | `/api/v1/channels/:id/mark_as_read` | Mark channel messages read |
 
 ## Messages
 
 ### List Messages
-
-Get messages from a channel with pagination.
 
 ```http
 GET /api/v1/messages?channel_id=<channel_id>&limit=50
 Authorization: Bearer <token>
 ```
 
-**Query Parameters:**
+If `channel_id` is omitted, the endpoint returns messages from channels accessible to the current user.
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `channel_id` | No | Numeric channel ID. If omitted, returns messages across accessible channels |
-| `limit` | No | Max messages (default: 50) |
+### Create Message by Room Name
 
-**Response (200):**
-
-```json
-{
-  "messages": [
-    {
-      "id": 1,
-      "content": "Hello world!",
-      "created_at": "2024-01-15T10:30:00Z",
-      "user": {
-        "id": 1,
-        "username": "johndoe"
-      },
-      "channel_id": 1,
-      "files": []
-    }
-  ]
-}
-```
-
-### Create Message
-
-Send a message to a channel.
+Useful for API integrations and Home Assistant-style room targets:
 
 ```http
 POST /api/v1/messages
@@ -170,26 +140,13 @@ Content-Type: application/json
 
 {
   "message": "Hello world!",
-  "room": "general"
+  "room_id": "general"
 }
 ```
 
-**Response (200):**
+If `room_id` is missing, HomeChat falls back to a default channel such as `home`, `general`, or `home-assistant`.
 
-```json
-{
-  "success": true,
-  "message": {
-    "id": 101,
-    "content": "Hello world!",
-    "created_at": "2024-01-15T10:35:00Z"
-  }
-}
-```
-
-### Create Message (Channel Endpoint)
-
-Alternative endpoint using channel ID.
+### Create Message by Channel ID
 
 ```http
 POST /api/v1/channels/:id/messages
@@ -197,225 +154,59 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "content": "Hello world!"
+  "message": "Hello world!"
 }
 ```
 
-### Send Direct Message
-
-Send a private message to a user.
-
-```http
-POST /api/v1/users/:id/messages
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "message": "Private message content"
-}
-```
-
-## Users
-
-### Get Current User
-
-```http
-GET /api/v1/me
-Authorization: Bearer <token>
-```
-
-**Response (200):**
+For private channels and direct messages, clients must send the E2EE metadata required by the server:
 
 ```json
 {
-  "id": 1,
-  "username": "johndoe",
-  "role": "user",
-  "created_at": "2024-01-01T00:00:00Z"
-}
-```
-
-### Search Users
-
-```http
-GET /api/v1/users/search?q=<query>
-Authorization: Bearer <token>
-```
-
-**Response (200):**
-
-```json
-{
-  "users": [
-    {
-      "id": 1,
-      "username": "johndoe",
-      "is_online": true
-    }
-  ]
-}
-```
-
-### Get User Profile
-
-```http
-GET /api/v1/users/:id
-Authorization: Bearer <token>
-```
-
-## Search
-
-### Global Search
-
-Search across users, channels, and messages.
-
-```http
-GET /api/v1/search?q=<query>
-Authorization: Bearer <token>
-```
-
-**Query Parameters:**
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `q` | Yes | Search query (min 2 chars) |
-
-**Response (200):**
-
-```json
-{
-  "users": [
-    {
-      "id": 1,
-      "username": "johndoe",
-      "is_online": true,
-      "avatar_initials": "J"
-    }
-  ],
-  "channels": [
-    {
-      "id": 1,
-      "name": "general",
-      "type": "public",
-      "is_member": true
-    }
-  ],
-  "messages": [
-    {
-      "id": 50,
-      "content": "Message containing query...",
-      "created_at": "2024-01-15T10:00:00Z",
-      "user": { "id": 1, "username": "johndoe" },
-      "channel": { "id": 1, "name": "general" }
-    }
-  ],
-  "totalResults": 10
-}
-```
-
-## Health & Metrics
-
-### Health Check
-
-No authentication required.
-
-```http
-GET /api/v1/health
-```
-
-**Response (200):**
-
-```json
-{
-  "status": "ok"
-}
-```
-
-### Basic Metrics
-
-No authentication required.
-
-```http
-GET /api/v1/metrics/health
-```
-
-**Response (200):**
-
-```json
-{
-  "status": "ok",
-  "timestamp": "2024-01-15T10:30:00Z",
-  "version": "Homechat",
-  "environment": "production"
-}
-```
-
-### Detailed Metrics
-
-Admin authentication required.
-
-```http
-GET /api/v1/metrics
-Authorization: Bearer <admin-token>
-```
-
-**Response (200):**
-
-```json
-{
-  "timestamp": "2024-01-15T10:30:00Z",
-  "application": {
-    "name": "Homechat",
-    "environment": "production",
-    "ruby_version": "3.3.0",
-    "rails_version": "8.0.2"
-  },
-  "users": {
-    "total": 100,
-    "admins": 2,
-    "online": 15
-  },
-  "channels": {
-    "total": 20,
-    "active_today": 10
-  },
-  "messages": {
-    "total": 5000,
-    "today": 150
+  "message": {
+    "content": "[encrypted]",
+    "content_encoding": "e2ee",
+    "encrypted_content": "base64...",
+    "content_hmac": "base64...",
+    "sender_key_fingerprint": "fingerprint",
+    "device_id": "device-id",
+    "e2ee_version": "1"
   }
 }
 ```
 
-**Prometheus Format:**
+### Delete Message
 
 ```http
-GET /api/v1/metrics
-Accept: text/plain
-Authorization: Bearer <admin-token>
-```
-
-Returns metrics in Prometheus exposition format for monitoring systems.
-
-## Direct Messages
-
-### List DM Conversations
-
-```http
-GET /api/v1/dm/channels
+DELETE /api/v1/messages/:id
 Authorization: Bearer <token>
 ```
 
-### Get DM Conversation
+Users can delete their own messages. Admins can delete any message.
+
+## Direct Messages
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/api/v1/dm/channels` | List current user's DM conversations |
+| `POST` | `/api/v1/dm/start` | Start or fetch a DM channel by username |
+| `POST` | `/api/v1/users/:id/messages` | Send a DM to a user ID |
+
+### Start DM
 
 ```http
 POST /api/v1/dm/start
 Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "username": "jane"
+}
 ```
 
-### Send Direct Message
+### Send DM
 
 ```http
-POST /api/v1/users/:user_id/messages
+POST /api/v1/users/:id/messages
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -424,44 +215,91 @@ Content-Type: application/json
 }
 ```
 
+Direct messages are E2EE-enforced. Current first-party clients send encrypted payloads and sender device metadata.
+
 ## File Attachments
 
-### Upload File
+### Upload Media
 
 ```http
-POST /api/v1/channels/:id/messages
+POST /api/v1/channels/:id/media
 Authorization: Bearer <token>
 Content-Type: multipart/form-data
 
-content=Message with file
+caption=Photo from the kitchen
 files[]=@/path/to/image.jpg
 ```
 
-### Supported File Types
+Attachments are disabled for E2EE-enforced private channels and direct messages until encrypted file support lands.
 
-| Type | Extensions | Max Size |
-|------|------------|----------|
-| Images | jpg, png, gif, webp | 10MB |
-| Documents | pdf, txt | 10MB |
+## Search
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/api/v1/search?q=<query>` | Search users, channels, and plaintext messages |
+| `GET` | `/api/v1/users/search?q=<query>` | Search users only |
+
+Search requires at least two characters. Encrypted message content is not server-searchable.
+
+## Push Notifications
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `PUT` | `/api/v1/fcm_token` | Register or update the current user's FCM token |
+| `DELETE` | `/api/v1/fcm_token` | Remove the current user's FCM token |
+
+```http
+PUT /api/v1/fcm_token
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "token": "fcm-token"
+}
+```
+
+## Bots
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/api/v1/bots` | List bots |
+| `POST` | `/api/v1/bots` | Create a bot |
+| `GET` | `/api/v1/bots/:id` | Show a bot |
+| `PATCH` | `/api/v1/bots/:id` | Update a bot |
+| `DELETE` | `/api/v1/bots/:id` | Delete a bot |
+| `GET` | `/api/v1/bots/:id/status` | Bot status |
+| `POST` | `/api/v1/bots/:id/activate` | Activate bot |
+| `POST` | `/api/v1/bots/:id/deactivate` | Deactivate bot |
+
+Webhook delivery uses `/api/v1/webhooks/:webhook_id`; see [Webhooks](/api/webhooks).
+
+## E2EE Key Management
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `PUT` | `/api/v1/me/hmac_key` | Store wrapped HMAC key metadata |
+| `GET` | `/api/v1/me/hmac_key` | Fetch current user's wrapped HMAC key |
+| `PUT` | `/api/v1/me/e2ee_key` | Publish this device's E2EE public key bundle |
+| `GET` | `/api/v1/users/:id/e2ee_key` | Fetch a user's E2EE device keys |
+| `GET` | `/api/v1/channels/:id/e2ee_keys` | Fetch channel member E2EE keys |
+| `POST` | `/api/v1/channels/:id/key_shares` | Submit encrypted channel key shares |
+| `GET` | `/api/v1/channels/:id/key_shares/me` | Fetch current user's key share |
+| `POST` | `/api/v1/channels/:id/rotate_key` | Rotate a channel key |
+| `GET` | `/api/v1/channels/:id/key_rotation_status` | Check key rotation status |
+| `POST` | `/api/v1/channels/:id/acknowledge_rotation` | Acknowledge key rotation |
 
 ## Pagination
 
-Endpoints that return lists support cursor-based pagination:
-
-```http
-GET /api/v1/messages?channel_id=1&limit=50
-```
-
-| Parameter | Description |
-|-----------|-------------|
-| `limit` | Items per page (default: 50, max: 100) |
-
-**Response includes pagination info:**
+Message list responses include pagination data:
 
 ```json
 {
-  "messages": [...],
+  "messages": [],
   "has_more": true,
   "oldest_id": 51
 }
 ```
+
+| Parameter | Description |
+|-----------|-------------|
+| `limit` | Items per page, default `50`, max `100` |

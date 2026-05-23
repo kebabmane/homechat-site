@@ -17,7 +17,7 @@ ws://localhost:3000/cable
 
 ### Authentication
 
-Prefer clients that can send the API token in an `Authorization: Bearer <token>` header during the WebSocket handshake. Query-string tokens remain supported only as a fallback for clients that cannot set WebSocket headers.
+Send API tokens in an `Authorization: Bearer <token>` header during the WebSocket handshake. Do not put bearer tokens in query strings; URLs are commonly captured by proxy logs, browser tooling, crash reports, and screenshots.
 
 ```
 wss://chat.example.com/cable
@@ -133,10 +133,10 @@ class ChatService {
     var chatChannel: Channel?
 
     init(serverURL: URL, token: String) {
-        var urlComponents = URLComponents(url: serverURL, resolvingAgainstBaseURL: false)!
-        urlComponents.queryItems = [URLQueryItem(name: "token", value: token)]
+        var request = URLRequest(url: serverURL.appendingPathComponent("cable"))
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
-        client = ActionCableClient(url: urlComponents.url!)
+        client = ActionCableClient(request: request)
         client.connect()
     }
 
@@ -166,8 +166,11 @@ class ChatService {
 import com.vinted.actioncable.client.kotlin.*
 
 class ChatService(serverUrl: String, token: String) {
-    private val uri = URI("$serverUrl/cable?token=$token")
-    private val consumer = Consumer(uri)
+    private val request = Request.Builder()
+        .url("$serverUrl/cable")
+        .header("Authorization", "Bearer $token")
+        .build()
+    private val consumer = Consumer(request)
 
     fun subscribeToChannel(channelId: Int) {
         val channel = Channel("ChatChannel", mapOf("channel_id" to channelId))

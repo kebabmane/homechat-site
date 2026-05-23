@@ -99,6 +99,17 @@ homechat/api-contracts/openapi.yaml
 
 When API endpoints, response fields, E2EE metadata, or compatibility requirements change, update both the Rails contract and the matching pages under `api/`.
 
+### E2EE Documentation Requirements
+
+Security pages must describe HomeChat E2EE precisely:
+
+- Private-channel and direct-message content is encrypted by current web, iOS, Android, and macOS clients before upload.
+- The server still sees metadata such as users, channel membership, timestamps, message sizes, delivery activity, and encrypted blob presence.
+- Web E2EE depends on trusted JavaScript delivery and remains sensitive to XSS.
+- Device identity is trust-on-first-use until explicit key verification is implemented.
+- Channel keys are long-lived per key epoch, so this is not Signal/MLS-grade forward secrecy or post-compromise recovery.
+- Attachments, bots, webhooks, and Home Assistant automations are not E2EE participants yet.
+
 ### Adding Pages
 
 1. Create a `.md` file in the appropriate directory

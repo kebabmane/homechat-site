@@ -29,6 +29,13 @@ export default defineConfig({
           ]
         },
         {
+          text: 'Release Readiness',
+          items: [
+            { text: 'Compatibility Matrix', link: '/guide/compatibility' },
+            { text: 'Release Checklist', link: '/guide/release' }
+          ]
+        },
+        {
           text: 'Deployment',
           items: [
             { text: 'Docker', link: '/guide/docker' },
@@ -75,7 +82,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/rhysevans/homechat' }
+      { icon: 'github', link: 'https://github.com/kebabmane/homechat' }
     ],
 
     footer: {
@@ -88,7 +95,7 @@ export default defineConfig({
     },
 
     editLink: {
-      pattern: 'https://github.com/rhysevans/homechat/edit/main/homechat-site/:path',
+      pattern: 'https://github.com/kebabmane/homechat-site/edit/main/:path',
       text: 'Edit this page on GitHub'
     }
   }

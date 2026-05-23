@@ -14,7 +14,7 @@ hero:
       link: /guide/
     - theme: alt
       text: View on GitHub
-      link: https://github.com/rhysevans/homechat
+      link: https://github.com/kebabmane/homechat
 
 features:
   - icon: 💬
@@ -27,8 +27,8 @@ features:
     title: Self-Hosted & Secure
     details: Your data stays on your hardware. Two-factor authentication, bcrypt-hashed API tokens, rate limiting, and security headers built-in.
   - icon: 📱
-    title: Native Mobile Apps
-    details: iOS and Android apps with push notifications via Firebase Cloud Messaging. PWA support for instant web installation.
+    title: Native Clients
+    details: iOS, Android, and macOS clients share the same API contract, E2EE model, and server discovery flow.
   - icon: 🏠
     title: Home Assistant Native
     details: Purpose-built for Home Assistant users. Run as an add-on, integrate via webhooks, and control your smart home from chat.
@@ -52,17 +52,18 @@ Unlike generic chat applications, HomeChat is designed specifically for smart ho
 - **AI bots** powered by LiteLLM can answer questions about your home
 - **Mobile apps** keep you connected with push notifications
 
-### Production Ready
+### Release Ready
 
-HomeChat isn't a toy project. It's built with the same tools and practices used by professional Rails applications:
+HomeChat is split into focused repositories with CI, API contract checks, and an explicit version compatibility policy:
 
-- **Rails 8** with Hotwire (Turbo + Stimulus)
-- **SQLite** with Solid Queue and Solid Cable
-- **Docker** and **Kamal** deployment options
-- **Comprehensive security** hardening guide
+- **Rails 8** backend with Hotwire, SQLite, Solid Queue, and Solid Cable
+- **OpenAPI contract** for backend-to-client compatibility
+- **Native clients** for iOS, Android, and macOS
+- **Home Assistant packaging** through the integration and supervised add-on
+- **Release matrix** covering API, clients, add-on, bot, and docs versions
 
 <div class="tip custom-block" style="padding-top: 8px">
 
-Ready to get started? Check out the [Installation Guide](/guide/installation) or dive into the [Features](/features/) to learn more.
+Ready to get started? Check out the [Installation Guide](/guide/installation), or review the [Compatibility Matrix](/guide/compatibility) before upgrading an existing stack.
 
 </div>

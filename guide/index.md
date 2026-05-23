@@ -8,7 +8,7 @@ HomeChat is a lightweight, self-hosted chat application designed specifically fo
 
 - **Real-time messaging** with channels and direct messages
 - **Bot integrations** for Home Assistant automations
-- **Mobile apps** for iOS and Android
+- **Native clients** for iOS, Android, and macOS
 - **Security-first** design with 2FA, API tokens, and rate limiting
 
 ## Prerequisites
@@ -43,7 +43,7 @@ For standalone Docker deployment:
 
 ```bash
 # Clone the repository
-git clone https://github.com/rhysevans/homechat.git
+git clone https://github.com/kebabmane/homechat.git
 cd homechat
 
 # Start with Docker Compose
@@ -72,6 +72,7 @@ Once HomeChat is running:
 2. **Configure settings** - Set your site name, enable features
 3. **Invite users** - Share the URL or enable public signups
 4. **Set up bots** - Connect Home Assistant automations
+5. **Check compatibility** - Confirm your clients and add-on match the [release matrix](/guide/compatibility)
 
 <div class="tip custom-block" style="padding-top: 8px">
 

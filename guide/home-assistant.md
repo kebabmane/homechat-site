@@ -34,23 +34,27 @@ The easiest setup for Home Assistant OS/Supervised users.
 
 1. Navigate to **Settings → Add-ons → Add-on Store**
 2. Click ⋮ → **Repositories**
-3. Add: `https://github.com/rhysevans/homechat-addon`
+3. Add: `https://github.com/kebabmane/homechat-addon`
 4. Find "HomeChat" and click **Install**
 
 ### Configure
 
 ```yaml
 site_name: "My Home Chat"
-allow_signups: true
+allow_signups: false
 port: 3000
+access_mode: "ingress"
+ssl: false
 enable_integrations: true
-auto_create_api_token: true
+auto_create_api_token: false
 home_assistant_integration: true
+discovery_mode: "auto"
+enable_nabu_casa: true
 ```
 
 ### Get API Token
 
-Start the add-on and check the logs for the auto-generated API token.
+Create an API token from **Admin → Bots** or enable `auto_create_api_token` temporarily and copy the generated token from the add-on logs.
 
 ## Option 2: Docker Alongside HA
 
@@ -64,19 +68,22 @@ services:
   homechat:
     image: ghcr.io/kebabmane/homechat:latest
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       - RAILS_ENV=production
-      - ENABLE_INTEGRATIONS=true
-      - AUTO_CREATE_API_TOKEN=true
-      - HOME_ASSISTANT_INTEGRATION=true
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - RAILS_ALLOW_INSECURE_HTTP=true
+      - SOLID_QUEUE_IN_PUMA=true
+      - AR_ENCRYPTION_PRIMARY_KEY=${AR_ENCRYPTION_PRIMARY_KEY}
+      - AR_ENCRYPTION_DETERMINISTIC_KEY=${AR_ENCRYPTION_DETERMINISTIC_KEY}
+      - AR_ENCRYPTION_KEY_DERIVATION_SALT=${AR_ENCRYPTION_KEY_DERIVATION_SALT}
+      - API_TOKEN_PEPPER=${API_TOKEN_PEPPER}
+      - DISCOVERY_MODE=cloud
     volumes:
-      - homechat_data:/data
-      - homechat_storage:/app/storage
+      - homechat_storage:/rails/storage
     restart: unless-stopped
 
 volumes:
-  homechat_data:
   homechat_storage:
 ```
 
@@ -100,7 +107,7 @@ volumes:
    - **Host**: `localhost` or HomeChat IP
    - **Port**: `3000`
    - **SSL**: `false` (for local)
-   - **API Token**: From HomeChat admin or logs
+   - **API Token**: From HomeChat admin or add-on logs
 
 ## Usage Examples
 

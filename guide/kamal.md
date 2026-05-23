@@ -14,7 +14,7 @@ Kamal is a modern deployment tool built by the Rails team that provides:
 ## Prerequisites
 
 ### Local Requirements
-- Ruby 3.3+ installed locally
+- Ruby 4.0+ installed locally
 - Docker installed and running
 - SSH access to your target servers
 
@@ -48,7 +48,7 @@ chown -R deploy:deploy /home/deploy/.ssh
 
 ```bash
 # Clone the repository
-git clone https://github.com/rhysevans/homechat.git
+git clone https://github.com/kebabmane/homechat.git
 cd homechat
 
 # Edit the deployment configuration
@@ -67,7 +67,16 @@ proxy:
 
 registry:
   server: ghcr.io
-  username: your-username
+  username: kebabmane
+
+env:
+  secret:
+    - RAILS_MASTER_KEY
+    # Add AR_ENCRYPTION_* secrets here if your deployment does not use Rails credentials.
+    # - AR_ENCRYPTION_PRIMARY_KEY
+    # - AR_ENCRYPTION_DETERMINISTIC_KEY
+    # - AR_ENCRYPTION_KEY_DERIVATION_SALT
+    # - API_TOKEN_PEPPER
 ```
 
 ### 3. Set Up Secrets
@@ -75,6 +84,9 @@ registry:
 ```bash
 # Set registry password (GitHub PAT for GHCR)
 export KAMAL_REGISTRY_PASSWORD="your_github_token"
+
+# Set Rails credentials key for this deployment
+export RAILS_MASTER_KEY="$(cat config/master.key)"
 ```
 
 ### 4. Deploy
